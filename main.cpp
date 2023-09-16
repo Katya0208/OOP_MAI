@@ -1,8 +1,10 @@
 #include "function.hpp"
 
 int main() {
+  int status = 0;
   string input;
-  getline(cin, input);
+  cin >> input;
   choosing_numbers(input);
+
   cout << input << endl;
 }

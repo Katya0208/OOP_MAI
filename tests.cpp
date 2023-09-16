@@ -32,6 +32,12 @@ TEST(test05, numbers) {
   ASSERT_TRUE("" == s);
 }
 
+TEST(test06, numbers) {
+  std::string s = "_ertyu12&*(";
+  choosing_numbers(s);
+  ASSERT_TRUE("Error input!" == s);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
