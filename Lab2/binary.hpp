@@ -1,21 +1,28 @@
 #pragma once
-#include <stdexcept>
-#include <vector>
+#include <iostream>
+using namespace std;
+
+#define GREEN_COLOR "\x1b[32m"
+
+void resizeArray(int *&data, int oldSize, int newSize, int value);
 
 class Binary {
  private:
-  std::vector<unsigned char> data;
+  int Size;
 
  public:
-  Binary(int size, const unsigned char* values);
-
-  Binary operator+(const Binary& other) const;
-  Binary operator-(const Binary& other) const;
-
-  void Print() const;
-
-  Binary& operator=(const Binary& other);
-  bool operator==(const Binary& other) const;
-  bool operator<(const Binary& other) const;
-  bool operator>(const Binary& other) const;
+  int *data;
+  Binary(int size, int *values);
+  Binary(const Binary &other);
+  Binary &operator=(const Binary &other);
+  bool operator==(const Binary &other) const;
+  Binary operator+(const Binary &other) const;
+  Binary operator-(const Binary &other) const;
+  bool operator<(const Binary &other) const;
+  bool operator>(const Binary &other) const;
+  bool operator>=(const Binary &other) const;
+  bool operator<=(const Binary &other) const;
+  void Print();
+  ~Binary();
 };
+Binary InputBinaryNumber();

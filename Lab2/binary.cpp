@@ -1,30 +1,82 @@
 #include <iostream>
-#include <vector>
 using namespace std;
 #include "binary.hpp"
 
-Binary::Binary(int size, const unsigned char* values) {
-  for (int i = 0; i < size; i++) {
-    if (values[i] != 0 && values[i] != 1) {
-      throw std::invalid_argument("Binary values must be 0 or 1.");
-    }
-    data.push_back(values[i]);
+void resizeArray(int *&data, int oldSize, int newSize, int value) {
+  int *newData = new int[newSize];  // Создаем новый массив размером newSize
+  int razn = newSize - oldSize;
+  // Заполняем новый массив нулями
+
+  for (int i = 0; i < newSize; i++) {
+    newData[i] = value;
   }
+  for (int i = razn; i < newSize; i++) {
+    newData[i] = data[i - razn];  // Копируем старые значения
+  }
+
+  data = newData;  // Переключаем указатель на новый массив
 }
 
-Binary Binary::operator+(const Binary& other) const {
-  size_t size = std::max(data.size(), other.data.size());
-  Binary result(0, nullptr);
-  result.data.resize(size, 0);
-
-  // Дополняем числа нулями до одинаковой длины
-  std::vector<unsigned char> a = data;
-  std::vector<unsigned char> b = other.data;
-  while (a.size() < size) {
-    a.insert(a.begin(), 0);
+Binary::Binary(int size, int *values) {  // Конструктор
+  this->Size = size;
+  this->data = new int[size];
+  for (int i = 0; i < size; i++) {
+    data[i] = values[i];
   }
-  while (b.size() < size) {
-    b.insert(b.begin(), 0);
+  //  cout << "Вызвался конструктор " << this << endl;
+}
+
+Binary::Binary(const Binary &other) {  // конструктор копирования
+  this->Size = other.Size;
+  this->data = new int[other.Size];
+  for (int i = 0; i < other.Size; i++) {
+    this->data[i] = other.data[i];
+  }
+  //  cout << "Вызвался конструктор копирования " << this << endl;
+}
+
+Binary &Binary::operator=(
+    const Binary &other) {  // перегрузка оператора присваивания
+  // cout << "Вызвался оператор = " << this << endl;
+  this->Size = other.Size;
+  if (this->data != nullptr) {
+    delete[] this->data;
+  }
+
+  this->data = new int[other.Size];
+  for (int i = 0; i < other.Size; i++) {
+    this->data[i] = other.data[i];
+  }
+  return *this;
+}
+
+bool Binary::operator==(const Binary &other) const {
+  if (this->Size != other.Size) {
+    return false;  // Если размеры разные, они точно не равны.
+  }
+
+  for (size_t i = 0; i < Size; ++i) {
+    if (this->data[i] != other.data[i]) {
+      return false;  // Если найдено несовпадение, массивы не равны.
+    }
+  }
+
+  return true;  // Если размеры одинаковы и все элементы совпадают, массивы
+                // равны.
+}
+
+Binary Binary::operator+(const Binary &other) const {
+  size_t size = max(Size, other.Size);
+  Binary result(size, new int[size]{});
+  int *a = this->data;
+  int *b = other.data;
+
+  if (this->Size < size) {
+    resizeArray(a, this->Size, size, 0);
+  }
+
+  if (other.Size < size) {
+    resizeArray(b, other.Size, size, 0);
   }
 
   int carry = 0;
@@ -35,31 +87,29 @@ Binary Binary::operator+(const Binary& other) const {
   }
 
   if (carry > 0) {
-    result.data.insert(result.data.begin(), 1);
+    size = size + 1;
+    resizeArray(result.data, result.Size, size, carry);
+    result.Size = size;
   }
 
   return result;
 }
 
-Binary Binary::operator-(const Binary& other) const {
-  // Для выполнения вычитания, нам нужно дополнить числа до одинаковой длины
+Binary Binary::operator-(const Binary &other) const {
+  size_t size = max(Size, other.Size);
+  Binary result(size, new int[size]{});
+  int *a = this->data;
+  int *b = other.data;
 
-  size_t size = std::max(data.size(), other.data.size());
-  Binary result(0, nullptr);
-  result.data.resize(size, 0);
-
-  // Дополняем числа нулями до одинаковой длины
-  std::vector<unsigned char> a = data;
-  std::vector<unsigned char> b = other.data;
+  if (this->Size < size) {
+    resizeArray(a, this->Size, size, 0);
+  }
+  if (other.Size < size) {
+    resizeArray(b, other.Size, size, 0);
+  }
 
   if (*this < other) {
-    std::swap(a, b);
-  }
-  while (a.size() < size) {
-    a.insert(a.begin(), 0);
-  }
-  while (b.size() < size) {
-    b.insert(b.begin(), 0);
+    swap(a, b);
   }
 
   int borrow = 0;
@@ -77,46 +127,17 @@ Binary Binary::operator-(const Binary& other) const {
   return result;
 }
 
-void Binary::Print() const {
-  for (size_t i = 0; i < data.size(); ++i) {
-    std::cout << static_cast<int>(data[i]) << " ";
+bool Binary::operator<(const Binary &other) const {
+  size_t size = max(Size, other.Size);
+
+  int *a = this->data;
+  int *b = other.data;
+
+  if (this->Size < size) {
+    resizeArray(a, this->Size, size, 0);
   }
-  std::cout << std::endl;
-}
-
-// Binary(const Binary& other) { data = other.data; }
-
-Binary& Binary::operator=(const Binary& other) {
-  if (this != &other) {
-    data = other.data;
-  }
-  return *this;
-}
-
-bool Binary::operator==(const Binary& other) const {
-  if (data.size() != other.data.size()) {
-    return false;
-  }
-
-  for (size_t i = 0; i < data.size(); ++i) {
-    if (data[i] != other.data[i]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool Binary::operator<(const Binary& other) const {
-  // Дополняем числа нулями до одинаковой длины
-  size_t size = std::max(data.size(), other.data.size());
-  std::vector<unsigned char> a = data;
-  std::vector<unsigned char> b = other.data;
-  while (a.size() < size) {
-    a.insert(a.begin(), 0);
-  }
-  while (b.size() < size) {
-    b.insert(b.begin(), 0);
+  if (other.Size < size) {
+    resizeArray(b, other.Size, size, 0);
   }
 
   for (size_t i = 0; i < size; i++) {
@@ -130,6 +151,22 @@ bool Binary::operator<(const Binary& other) const {
   return false;  // a == b
 }
 
-bool Binary::operator>(const Binary& other) const {
+bool Binary::operator>(const Binary &other) const {
   return !(*this < other) && !(*this == other);
+}
+
+bool Binary::operator>=(const Binary &other) const { return !(*this < other); }
+
+bool Binary::operator<=(const Binary &other) const { return !(*this > other); }
+
+void Binary::Print() {
+  for (int i = 0; i < Size; i++) {
+    cout << data[i] << "";
+  }
+  cout << endl;
+}
+
+Binary::~Binary() {
+  // cout << "Вызвался деструктор " << this << endl;
+  delete[] data;
 }
