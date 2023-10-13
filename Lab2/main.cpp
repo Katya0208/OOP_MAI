@@ -5,28 +5,38 @@ using namespace std;
 
 #define GREEN_COLOR "\x1b[32m"
 
-// Функция для ввода двоичного числа с клавиатуры
 Binary InputBinaryNumber() {
   string binaryStr;
-  cout << "Введите двоичное число (без пробелов): ";
-  cin >> binaryStr;
+  bool validInput = false;
 
-  int size = binaryStr.length();
-  int *values = new int[size];
+  while (!validInput) {
+    cout << "Введите двоичное число (без пробелов): ";
+    cin >> binaryStr;
 
-  for (int i = 0; i < size; i++) {
-    if (binaryStr[i] == '0') {
-      values[i] = 0;
-    } else if (binaryStr[i] == '1') {
-      values[i] = 1;
-    } else {
-      cout << "Введен некорректный символ. Пожалуйста, вводите только 0 и 1."
-           << endl;
-      return Binary(0, nullptr);
+    int size = binaryStr.length();
+    int *values = new int[size];
+
+    validInput = true;
+
+    for (int i = 0; i < size; i++) {
+      if (binaryStr[i] == '0') {
+        values[i] = 0;
+      } else if (binaryStr[i] == '1') {
+        values[i] = 1;
+      } else {
+        cout << "Введен некорректный символ. Пожалуйста, вводите только 0 и 1."
+             << endl;
+        validInput = false;
+        break;
+      }
+    }
+
+    if (validInput) {
+      return Binary(size, values);
     }
   }
 
-  return Binary(size, values);
+  return Binary(0, nullptr);
 }
 
 int main() {

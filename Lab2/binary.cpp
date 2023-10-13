@@ -3,41 +3,36 @@ using namespace std;
 #include "binary.hpp"
 
 void resizeArray(int *&data, int oldSize, int newSize, int value) {
-  int *newData = new int[newSize];  // Создаем новый массив размером newSize
+  int *newData = new int[newSize];
   int razn = newSize - oldSize;
-  // Заполняем новый массив нулями
 
   for (int i = 0; i < newSize; i++) {
     newData[i] = value;
   }
   for (int i = razn; i < newSize; i++) {
-    newData[i] = data[i - razn];  // Копируем старые значения
+    newData[i] = data[i - razn];
   }
 
-  data = newData;  // Переключаем указатель на новый массив
+  data = newData;
 }
 
-Binary::Binary(int size, int *values) {  // Конструктор
+Binary::Binary(int size, int *values) {
   this->Size = size;
   this->data = new int[size];
   for (int i = 0; i < size; i++) {
     data[i] = values[i];
   }
-  //  cout << "Вызвался конструктор " << this << endl;
 }
 
-Binary::Binary(const Binary &other) {  // конструктор копирования
+Binary::Binary(const Binary &other) {
   this->Size = other.Size;
   this->data = new int[other.Size];
   for (int i = 0; i < other.Size; i++) {
     this->data[i] = other.data[i];
   }
-  //  cout << "Вызвался конструктор копирования " << this << endl;
 }
 
-Binary &Binary::operator=(
-    const Binary &other) {  // перегрузка оператора присваивания
-  // cout << "Вызвался оператор = " << this << endl;
+Binary &Binary::operator=(const Binary &other) {
   this->Size = other.Size;
   if (this->data != nullptr) {
     delete[] this->data;
@@ -52,17 +47,16 @@ Binary &Binary::operator=(
 
 bool Binary::operator==(const Binary &other) const {
   if (this->Size != other.Size) {
-    return false;  // Если размеры разные, они точно не равны.
+    return false;
   }
 
   for (size_t i = 0; i < Size; ++i) {
     if (this->data[i] != other.data[i]) {
-      return false;  // Если найдено несовпадение, массивы не равны.
+      return false;
     }
   }
 
-  return true;  // Если размеры одинаковы и все элементы совпадают, массивы
-                // равны.
+  return true;
 }
 
 Binary Binary::operator+(const Binary &other) const {
@@ -142,13 +136,13 @@ bool Binary::operator<(const Binary &other) const {
 
   for (size_t i = 0; i < size; i++) {
     if (a[i] < b[i]) {
-      return true;  // a < b
+      return true;
     } else if (a[i] > b[i]) {
-      return false;  // a > b
+      return false;
     }
   }
 
-  return false;  // a == b
+  return false;
 }
 
 bool Binary::operator>(const Binary &other) const {
@@ -166,7 +160,4 @@ void Binary::Print() {
   cout << endl;
 }
 
-Binary::~Binary() {
-  // cout << "Вызвался деструктор " << this << endl;
-  delete[] data;
-}
+Binary::~Binary() { delete[] data; }
